@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Last-Modified" content="0">
+    <meta http-equiv="Cache-Control" content="no-cache, mustrevalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <title>Maestros</title>
+    <link rel="stylesheet" href="estilos.css">
+    <script src="/__/firebase/7.8.1/firebase-app.js"></script>
+    <script src="/__/firebase/7.8.1/firebase-auth.js"></script>
+    <script src="/__/firebase/7.8.1/firebase-firestore.js"></script>
+    <script src="/__/firebase/7.8.1/firebase-storage.js"></script>
+    <script src="/__/firebase/init.js"></script>
+    <script src="util.js"></script>
+    <script type="module" src="herramientas-abc.js"></script>
+    <script type="module" src="mi-footer.js"></script>
+  </head>
+  <body>
+    <header>
+      <br>
+      <h1>Maestros</h1>  
+      <p>
+        <img id="avatar"src="" width="50px" style="border-radius: 50%;">
+        <br>
+        <output id="correo"></output>
+        <br>
+        <output id="rol"></output>
+      </p>
+    </header>
+    <form action="javascript:guarda()">
+      <button class="btn btn-info" type="button" id="pasa"  onclick="ayuda();" >Ayuda</button>
+      <button class="btn btn-info" type="button" id="pasa"  onclick="M_es();" >Regresar</button>
+      <button class="btn btn-info" type="button" id="pasa"  onclick="regresa();" >Menu</button>
+      <button class="btn btn-info" type="button" id="escul" onclick="escuela();">Escuelas</button>
+      <herramientas-abc></herramientas-abc>  
+      <button  onclick="cierraSesion()">Cerrar sesión</button>
+    </form>
+    <section>
+      <figure id="figure">
+        <img id="img" alt="Imagen del Usuario" width="200px">
+      </figure>
+      <fieldset>
+        <legend>Cue (email)</legend>
+        <input id="cue" type="email">
+      </fieldset>
+      <fieldset>
+        <legend>Nombre </legend>
+        <input id="nombre" type="text">
+      </fieldset>
+      <fieldset>
+        <legend>Imagen</legend>
+        <input id="imagen" type="file" accept=".png,.jpg,.jpeg,.gif">
+      </fieldset>
+      <ul class="usuarios" id="lista">
+        <li><progress max="100">Cargando…</progress></li>
+      </ul>
+    </section>  
+    <mi-footer></mi-footer>
+    <script>
+      //@ts-check
+      try {
+        // @ts-ignore
+        let app = firebase.app();
+        let features = ["auth", "firestore", "storage", "database", "messaging"]
+          .filter(feature => typeof app[feature] === "function");
+        // @ts-ignore
+        mensaje.value = `Firebase SDK cargó con: ${features.join(', ')}`;
+      } catch (e) {
+        muestraError(e);
+      }
+      registraServiceWorker();
+      
+      async function registraServiceWorker() {
+        if ("serviceWorker" in navigator) {
+          try {
+      
+            const registro = await navigator.serviceWorker.register("sw.js");
+      
+            console.log("Service Worker registrado.");
+            console.log(registro);
+          } catch (e) {
+      
+            muestraError(e);
+          }
+        }
+      }
+      
+      function muestraError(e) {
+        console.log(e);
+        // @ts-ignore
+      //  mensaje.value = e.message;
+      }
+
+      function ayuda(){
+        location.href="ayuda.html";
+      }
+
+      function M_es(){
+        location.href="M_es.html";
+      }
+      
+      function muestraUsuario(){
+        var user = firebase.auth().currentUser;
+        let firestore = firebase.firestore();
+        document.getElementById("correo").innerHTML="Usuario: "+user.email;
+        document.getElementById("avatar").src=user.photoURL;
+        var userrol=document.getElementById("rol");
+        var docRef = firestore.collection("Maestros").doc(user.email);
+        docRef.get().then(function (doc) {
+          if (doc.exists) {
+            userrol.innerHTML= "Rol: Maestro";
+          } else {
+            userrol.innerHTML= "Rol: Maestro";
+          }
+        }).catch(function (error) {
+          console.log("Error getting document:", error);
+        });
+        
+      }
+
+      let id = "";
+      const auth = firebase.auth();
+      const storage = firebase.storage();
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+      const firestore = firebase.firestore();
+      auth.onAuthStateChanged(
+        async usuarioAuth => {
+          if (usuarioAuth && usuarioAuth.email) {
+            muestraUsuario()
+            agrega();
+            muestraLista();
+            valida();
+          } else {
+            await auth.signInWithRedirect(provider);
+
+          }
+        },
+        procesaError
+      );
+      
+      function valida(){
+        const db = firebase.firestore();
+        var  aux2 = "Maestro",aux3 = "Usuario";
+        var user = firebase.auth().currentUser;
+        var name, email, photoUrl, uid, emailVerified;
+        if (user != null) {
+          name = user.displayName;
+          email = user.email;
+          photoUrl = user.photoURL;
+          emailVerified = user.emailVerified;
+          uid = user.uid;  
+        }
+        console.log(email);
+        db.collection("Maestros")
+        .get()
+        .then(function(querySnapshot) {
+          querySnapshot.forEach(function(doc) {
+            if (email==doc.id){
+              if("Invitado"==doc.data().ROL_IDS){
+                location.href="index.html";
+              }
+              if("Maestro"==doc.data().ROL_IDS){
+              }
+              if("Usuario"==doc.data().ROL_IDS){
+                ocultar();
+              }
+            }
+          });
+        })
+        .catch(function(error) {
+          console.log("Error getting documents: ", error);
+        });
+
+      }
+    
+      function ocultar(){
+        var elemento = document.getElementById("pasa");
+        elemento.style.display = 'none';
+      }
+
+      function regresa(){
+        location.href="index.html";
+      }
+      
+      function escuela(){
+        location.href="escuela.html";
+      }
+
+      async function calculaCelda(doc) {
+        const data = doc.data();
+        const url = await storage.ref(doc.id).getDownloadURL();
+        return (
+          `<li class="doc" onclick="muestra('${cod(doc.id)}')">
+            <figure>
+              <img src="${cod(url)}" alt="${cod(doc.id)}" width="200px">
+            </figure>
+            <div>
+              <strong>${cod(doc.id)}</strong><br>
+              ${cod(doc.data().PAS_NOMBRE)}
+            </div>
+          </li><br>`
+        );
+      }
+      
+      async function muestraLista() {
+        firestore.collection("Maestros").onSnapshot(
+          async querySnapshot => {
+            const promesas = [];
+            querySnapshot.forEach(doc => promesas.push(calculaCelda(doc)));
+            const celdas = await Promise.all(promesas);
+            lista.innerHTML = "";
+            for (const celda of celdas) {
+              lista.innerHTML += celda;
+            }
+          },
+          e => {
+            procesaError(e);
+            muestraLista();
+          }
+        );
+      }
+     
+      
+      function agrega() {
+        agregar.disabled = true;
+        eliminar.disabled = true;
+        figure.hidden = true;
+        cue.readOnly = false;
+        cue.required = true;
+        nombre.required=true;
+        imagen.required = true;
+        id = "";
+        cue.value = "";
+        nombre.value="";
+        imagen.value = "";
+      }
+     
+      function leeModelo() {
+        return {
+          PAS_NOMBRE: nombre.value
+        };
+      }
+
+      async function guarda() {
+        try {
+          let ref;
+          if (id) {
+            ref = firestore.collection("Maestros").doc(id);
+          }
+          else {
+            ref = firestore.collection("Maestros").doc(cue.value);
+          }
+          if (fileSeleccionado(imagen)) {
+            const refStorage = storage.ref(ref.id);
+            await refStorage.put(imagen.files[0]);
+          }
+          await ref.set(leeModelo());
+          agrega();
+        } catch (e) {
+          procesaError(e);
+        }
+      }
+  
+      async function elimina() {
+        try {
+          if (confirm("Confirma la eliminación.")) {
+            await firestore.collection("Maestros").doc(id).delete();
+            storage.ref(id).delete();
+            agrega();
+          }
+        } catch (e) {
+          procesaError(e);
+        }
+      }
+
+      async function cierraSesion() {
+        try {
+          firebase.auth().signOut().then(function() {
+        })
+        .catch(function(error) {
+        });
+        } 
+        catch (e) {
+          procesaError(e);
+        }
+      }
+
+      async function muestra(selección) {
+        try {
+          agregar.disabled = false;
+          eliminar.disabled = false;
+          figure.hidden = false;
+          cue.readOnly = true;
+          cue.required = false;  
+          nombre.required = false;
+          imagen.required = false;
+          let doc =
+            await firestore.collection("Maestros").doc(selección).get();
+          if (doc.exists) {
+            id = doc.id;
+            let data = doc.data();
+            cue.value = doc.id;
+            nombre.value=data.PAS_NOMBRE;
+            imagen.value = "";
+                     
+            img.src = await storage.ref(doc.id).getDownloadURL();
+          }
+          else {
+            alert("El usuario selecionado no está registrado.");
+            agrega();
+          }
+        }
+        catch (e) {
+          procesaError(e)
+        }
+      }
+    </script>
+  </body>
+</html>

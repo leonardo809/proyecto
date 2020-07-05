@@ -1,0 +1,15 @@
+{
+  "short_name": "lctfp",
+  "name": "royecto final",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#4fc3f7",
+  "theme_color": "#ffcb2d",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "35x35",
+      "type": "image/png"
+    }
+  ]
+}

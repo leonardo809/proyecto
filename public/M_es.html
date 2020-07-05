@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>M_escuelas</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/7.8.2/firebase-app.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/7.8.2/firebase-auth.js"></script>
+    <script defer src="/__/firebase/7.8.2/firebase-database.js"></script>
+    <script defer src="/__/firebase/7.8.2/firebase-messaging.js"></script>
+    <script defer src="/__/firebase/7.8.2/firebase-storage.js"></script>
+    <!-- initialize the SDK after all desired features are loaded -->
+    <script defer src="/__/firebase/init.js"></script>
+
+    <style media="screen">
+      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+      footer{font-size: small;}
+      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      #message a { display: block; text-align: center; background: #800040; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      @media (max-width: 600px) {
+        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body { border-top: 16px solid #ffa100; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="message">
+      <h1>Escuelas</h1>
+      <p><a href="ENBA_M.html">ENBA</a></p>
+      <p><a href="UPIICSA_M.html">UPIICSA</a></p>
+      <p><a href="ESE_M.html">ESE</a></p>
+      <p></p><a href="ESCOM_M.html">ESCOM</a></p>
+      <p></p><a href="index.html">MENU</a></p>
+    </div>
+    <mi-footer></mi-footer>
+  </body>
+  <script>
+      //@ts-check
+      try {
+        // @ts-ignore
+        let app = firebase.app();
+        let features = ["auth", "firestore", "storage", "database", "messaging"]
+          .filter(feature => typeof app[feature] === "function");
+        // @ts-ignore
+        mensaje.value = `Firebase SDK cargó con: ${features.join(', ')}`;
+      } catch (e) {
+        muestraError(e);
+      }
+      registraServiceWorker();
+      
+      async function registraServiceWorker() {
+        if ("serviceWorker" in navigator) {
+          try {
+      
+            const registro = await navigator.serviceWorker.register("sw.js");
+      
+            console.log("Service Worker registrado.");
+            console.log(registro);
+          } catch (e) {
+      
+            muestraError(e);
+          }
+        }
+      }
+      
+      function muestraError(e) {
+        console.log(e);
+        // @ts-ignore
+       // mensaje.value = e.message;
+      }
+  </script>
+</html>
